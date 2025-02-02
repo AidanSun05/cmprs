@@ -1,0 +1,74 @@
+name: Publish release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    name: Build
+    strategy:
+      matrix:
+        os: [[windows-latest, cmprs.exe], [ubuntu-latest, cmprs], [macos-latest, cmprs]]
+    runs-on: ${{ matrix.os[0] }}
+
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions-rust-lang/setup-rust-toolchain@v1
+
+    - name: Build
+      run: cargo build --release
+
+    - name: Upload
+      uses: actions/upload-artifact@v4
+      with:
+        name: cmprs-${{ matrix.os[0] }}
+        path: target/release/${{ matrix.os[1] }}
+
+  publish-release:
+    name: Publish release
+    runs-on: ubuntu-latest
+    needs: [build]
+    permissions:
+      contents: write
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Download Linux release
+      uses: actions/download-artifact@v4
+      with:
+        name: cmprs-ubuntu-latest
+        path: cmprs-linux
+
+    - name: Download macOS release
+      uses: actions/download-artifact@v4
+      with:
+        name: cmprs-macos-latest
+        path: cmprs-macos
+
+    - name: Download Windows release
+      uses: actions/download-artifact@v4
+      with:
+        name: cmprs-windows-latest
+        path: cmprs-windows.exe
+
+    - name: Compress releases
+      run: |
+        zip cmprs-linux.zip cmprs-linux -r -qq
+        zip cmprs-macos.zip cmprs-macos -r -qq
+        zip cmprs-windows.zip cmprs-windows.exe -r -qq
+
+    - name: Get latest changes
+      run: echo "CHANGES=$(perl -0777 -ne 'print $1 if /\n## .*?\r?\n\r?\n(.*?)\r?\n\r?\n## /s' changelog.md)" >> $GITHUB_OUTPUT
+      id: changes
+
+    - name: Release
+      uses: softprops/action-gh-release@v2
+      with:
+        body_path: ${{ steps.changes.outputs.CHANGES }}
+        files: |
+          cmprs-linux.zip
+          cmprs-macos.zip
+          cmprs-windows.zip
