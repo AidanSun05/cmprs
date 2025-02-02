@@ -1,0 +1,24 @@
+name: Debug build
+
+on:
+  push:
+    paths-ignore:
+      - 'docs/**'
+      - '.github/workflows/rustfmt-check.yml'
+      - '.github/workflows/publish-release.yml'
+    branches:
+      - '**'
+jobs:
+  build:
+    name: Build
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions-rust-lang/setup-rust-toolchain@v1
+
+    - name: Build
+      run: cargo build

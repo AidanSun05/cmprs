@@ -1,0 +1,23 @@
+name: rustfmt Check
+
+on:
+  push:
+    paths-ignore:
+      - 'docs/**'
+      - '.github/workflows/build-debug.yml'
+      - '.github/workflows/publish-release.yml'
+  pull_request:
+    paths-ignore:
+      - 'docs/**'
+
+jobs:
+  rustfmt-check:
+    name: rustfmt Check
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions-rust-lang/setup-rust-toolchain@v1
+
+    - name: rustfmt Check
+      run: cargo fmt --all -- --check
