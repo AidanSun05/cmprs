@@ -1,0 +1,14 @@
+[package]
+name = "cmprs"
+version = "1.0.0"
+description = "Multithreaded image compressor"
+edition = "2021"
+
+[dependencies]
+glob = "0.3"
+mozjpeg = "0.10"
+image = "0.25"
+kamadak-exif = "0.6"
+oxipng = "8.0"
+crossbeam-deque = "0.8"
+clap = { version = "4.5.27", features = ["derive"] }
