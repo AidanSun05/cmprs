@@ -47,12 +47,19 @@ fn write(path: &str, args: &Args) -> Result<(usize, usize), Box<dyn Error>> {
 
 pub fn compress_with_output(path: &str, orig_sum: &mut usize, new_sum: &mut usize, args: &Args) {
     // Check for directories
-    if metadata(path).unwrap().is_dir() {
-        println!(
-            "{}: Use glob patterns to select files inside directories",
-            path
-        );
-        return;
+    match metadata(path) {
+        Ok(data) => {
+            if data.is_dir() {
+                println!(
+                    "{}: Use glob patterns to select files inside directories",
+                    path
+                );
+                return;
+            }
+        },
+        Err(e) => {
+            println!("{}: {}", path, e);
+        },
     }
 
     match write(path, args) {
