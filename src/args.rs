@@ -3,8 +3,9 @@ use clap::{Parser, ValueEnum};
 #[derive(Parser)]
 #[command(version, about, long_about = None)]
 pub struct Args {
-    /// Glob path to a file or set of files to compress
-    pub path: String,
+    /// Set of input files to compress
+    #[arg(required = true)]
+    pub paths: Vec<String>,
 
     /// Maximum number of threads to use
     #[arg(short, long)]

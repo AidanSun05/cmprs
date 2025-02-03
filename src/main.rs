@@ -51,7 +51,11 @@ fn scope_fn(
 fn main() {
     let args = Args::parse();
 
-    let paths = files::get_glob(&args.path);
+    let paths = if args.paths.len() == 1 {
+        files::get_glob(&args.paths[0])
+    } else {
+        args.paths.clone()
+    };
 
     let num_threads = std::thread::available_parallelism().unwrap().get();
     let num_workers = std::cmp::min(args.jobs.unwrap_or(num_threads), paths.len());
