@@ -57,6 +57,11 @@ fn main() {
         args.paths.clone()
     };
 
+    if paths.is_empty() {
+        println!("No input files, exiting.");
+        return;
+    }
+
     let num_threads = std::thread::available_parallelism().unwrap().get();
     let num_workers = std::cmp::min(args.jobs.unwrap_or(num_threads), paths.len());
     println!("Compression with up to {} threads.", num_workers);
