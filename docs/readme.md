@@ -21,18 +21,18 @@ Nonessential metadata is also removed to further reduce size:
 $ cmprs --help
 Multithreaded image compressor
 
-Usage: cmprs [OPTIONS] <PATH>
+Usage: cmprs [OPTIONS] <PATHS>...
 
 Arguments:
-  <PATH>
-          Glob path to a file or set of files to compress
+  <PATHS>...
+          Set of input files to compress
 
 Options:
   -j, --jobs <JOBS>
           Maximum number of threads to use
 
   -o, --overwrite
-          If input files are overwritten with compressed outputs
+          Overwrite input files with compressed outputs
 
       --jpg-quality <JPG_QUALITY>
           Quality of JPEG files (1-100; 60-80 recommended)
@@ -40,7 +40,7 @@ Options:
           [default: 75]
 
       --png-strip <PNG_STRIP>
-          If nonessential PNG chunks are stripped
+          Strip nonessential PNG chunks
 
           [default: safe]
 
