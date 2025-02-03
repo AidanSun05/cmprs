@@ -59,7 +59,7 @@ pub fn compress_with_output(path: &str, orig_sum: &mut usize, new_sum: &mut usiz
         }
         Err(e) => {
             println!("{}: {}", path, e);
-        return;
+            return;
         }
     }
 
@@ -69,7 +69,7 @@ pub fn compress_with_output(path: &str, orig_sum: &mut usize, new_sum: &mut usiz
                 // Skip writing files that have increased in size
                 let diff = new_size - orig_size;
                 let (formatted_size, size_prefix) = files::format_size(diff);
-                println!("{}: skipped, +{} {}B", path, formatted_size, size_prefix);
+                println!("{}: skipped, +{:.2} {}B", path, formatted_size, size_prefix);
             } else {
                 let diff = orig_size - new_size;
                 let (formatted_size, size_prefix) = files::format_size(diff);
