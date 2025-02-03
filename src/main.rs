@@ -8,6 +8,7 @@ use args::Args;
 use clap::Parser;
 use compress::compress_with_output;
 use crossbeam_deque::{Injector, Stealer, Worker};
+use std::collections::HashSet;
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::Instant;
@@ -50,12 +51,7 @@ fn scope_fn(
 
 fn main() {
     let args = Args::parse();
-
-    let paths = if args.paths.len() == 1 {
-        files::get_glob(&args.paths[0])
-    } else {
-        args.paths.clone()
-    };
+    let paths: HashSet<_> = args.paths.iter().flat_map(|s| files::get_glob(s)).collect();
 
     if paths.is_empty() {
         println!("No input files, exiting.");
