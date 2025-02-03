@@ -56,10 +56,11 @@ pub fn compress_with_output(path: &str, orig_sum: &mut usize, new_sum: &mut usiz
                 );
                 return;
             }
-        },
+        }
         Err(e) => {
             println!("{}: {}", path, e);
-        },
+        return;
+        }
     }
 
     match write(path, args) {
