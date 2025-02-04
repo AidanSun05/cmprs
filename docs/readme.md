@@ -31,8 +31,18 @@ Options:
   -j, --jobs <JOBS>
           Maximum number of threads to use
 
-  -o, --overwrite
-          Overwrite input files with compressed outputs
+  -o, --output-format <OUTPUT_FORMAT>
+          Format of output file names
+
+          Format specifiers:
+          - %e: File extension without leading dot
+          - %s: File stem (file name before last dot)
+          - %%: The '%' character
+
+          [default: compressed_%s.%e]
+
+      --overwrite
+          Overwrite input files with compressed outputs (short for --output-format %s.%e)
 
       --jpg-quality <JPG_QUALITY>
           Quality of JPEG files (1-100; 60-80 recommended)
@@ -65,7 +75,7 @@ By default, `cmprs` attempts to create the maximum number of threads your CPU su
 > [!IMPORTANT]
 > The actual number of threads that `cmprs` creates will never be larger than the number of input files it receives.
 
-When `cmprs` operates on files, it does not overwrite them by default. Instead, compressed files have a `compressed_` prefix. To overwrite the original files, use the `-o` switch.
+When `cmprs` operates on files, it does not overwrite them by default. Instead, compressed files have a `compressed_` prefix. To overwrite the original files, use the `--overwrite` switch. To set a custom output file name, use the `-o`/`--output-format` option. This option accepts format specifiers listed in the help text above.
 
 > [!WARNING]
 > Overwriting input files may leave you unable to access them. Back up important data.
@@ -77,7 +87,7 @@ The `--png-strip` option allows you to control the removal of nonessential metad
 ## Example Command and Output
 
 ```text
-$ cmprs photos/* -o
+$ cmprs photos/* --overwrite
 Compression with up to 16 threads.
 photos/20240421_141115.jpg: saved 1.56 MB (82.34%)
 photos/20240414_235123.jpg: saved 2.38 MB (80.32%)
