@@ -2,7 +2,7 @@ use std::error::Error;
 use std::ffi::OsStr;
 use std::fs::{metadata, File};
 use std::io::{BufReader, BufWriter, Read, Write};
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 use crate::args::Args;
 use crate::{compress_jpg, compress_png, files};
@@ -13,6 +13,33 @@ fn compress(ext: &str, data: Vec<u8>, args: &Args) -> Result<Vec<u8>, Box<dyn Er
         "png" => compress_png::compress(data, args),
         _ => Err("Unknown file type".into()),
     }
+}
+
+fn format_output(format_str: &str, stem: &str, ext: &str) -> String {
+    let mut result = String::new();
+    let mut iter = format_str.chars().peekable();
+
+    while let Some(c) = iter.next() {
+        if c != '%' {
+            result.push(c);
+            continue;
+        }
+
+        if let Some(&specifier) = iter.peek() {
+            iter.next(); // Consume the specifier
+            let replacement = match specifier {
+                'e' => ext,
+                's' => stem,
+                '%' => "%", // Escape %%
+                _ => "",
+            };
+            result.push_str(replacement);
+        }
+
+        // Don't handle trailing '%'
+    }
+
+    result
 }
 
 fn write(path: &str, args: &Args) -> Result<(usize, usize), Box<dyn Error>> {
@@ -29,14 +56,15 @@ fn write(path: &str, args: &Args) -> Result<(usize, usize), Box<dyn Error>> {
 
     let new_size = result.len();
     if new_size < orig_size {
-        let new_path = if args.overwrite {
-            PathBuf::from(path)
+        let stem = path.file_stem().unwrap().to_string_lossy();
+        let format_str = if args.overwrite {
+            "%s.%e"
         } else {
-            let parent = path.parent().unwrap();
-            let name = path.file_name().unwrap().to_string_lossy();
-            parent.join(format!("compressed_{}", name))
+            &args.output_format
         };
+        let output_path = format_output(&format_str, &stem, &ext);
 
+        let new_path = path.parent().unwrap().join(output_path);
         let output_file = File::create(new_path)?;
         let mut writer = BufWriter::new(output_file);
         writer.write_all(&result)?;

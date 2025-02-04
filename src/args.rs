@@ -11,8 +11,17 @@ pub struct Args {
     #[arg(short, long)]
     pub jobs: Option<usize>,
 
-    /// Overwrite input files with compressed outputs
-    #[arg(short, long)]
+    /// Format of output file names
+    ///
+    /// Format specifiers:
+    /// - %e: File extension without leading dot
+    /// - %s: File stem (file name before last dot)
+    /// - %%: The '%' character
+    #[arg(short, long, default_value_t = String::from("compressed_%s.%e"), verbatim_doc_comment)]
+    pub output_format: String,
+
+    /// Overwrite input files with compressed outputs (short for --output-format %s.%e)
+    #[arg(long)]
     pub overwrite: bool,
 
     /// Quality of JPEG files (1-100; 60-80 recommended)
