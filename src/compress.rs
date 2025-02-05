@@ -1,3 +1,4 @@
+use colored::Colorize;
 use std::error::Error;
 use std::ffi::OsStr;
 use std::fs::{metadata, File};
@@ -79,8 +80,9 @@ pub fn compress_with_output(path: &str, orig_sum: &mut usize, new_sum: &mut usiz
         Ok(data) => {
             if data.is_dir() {
                 println!(
-                    "{}: Use glob patterns to select files inside directories",
-                    path
+                    "{}: {}",
+                    path,
+                    "Use glob patterns to select files inside directories".yellow()
                 );
                 return;
             }
@@ -97,20 +99,30 @@ pub fn compress_with_output(path: &str, orig_sum: &mut usize, new_sum: &mut usiz
                 // Skip writing files that have increased in size
                 let diff = new_size - orig_size;
                 let (formatted_size, size_prefix) = files::format_size(diff);
-                println!("{}: skipped, +{:.2} {}B", path, formatted_size, size_prefix);
+                println!(
+                    "{}: {}, +{:.2} {}B",
+                    path,
+                    "skipped".yellow(),
+                    formatted_size,
+                    size_prefix
+                );
             } else {
                 let diff = orig_size - new_size;
                 let (formatted_size, size_prefix) = files::format_size(diff);
                 let saved_percent = (diff as f64 / orig_size as f64) * 100.0;
                 println!(
-                    "{}: saved {:.2} {}B ({:.2}%)",
-                    path, formatted_size, size_prefix, saved_percent
+                    "{}: {} {:.2} {}B ({:.2}%)",
+                    path,
+                    "saved".green(),
+                    formatted_size,
+                    size_prefix,
+                    saved_percent
                 );
 
                 *orig_sum += orig_size;
                 *new_sum += new_size;
             }
         }
-        Err(e) => println!("{}: {}", path, e.to_string()),
+        Err(e) => println!("{}: {}", path, e.to_string().red()),
     }
 }

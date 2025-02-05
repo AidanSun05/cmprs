@@ -12,3 +12,4 @@ kamadak-exif = "0.6"
 oxipng = "8.0"
 crossbeam-deque = "0.8"
 clap = { version = "4.5.27", features = ["derive"] }
+colored = "3.0"

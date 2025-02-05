@@ -6,6 +6,7 @@ mod files;
 
 use args::Args;
 use clap::Parser;
+use colored::Colorize;
 use compress::compress_with_output;
 use crossbeam_deque::{Injector, Stealer, Worker};
 use std::collections::HashSet;
@@ -119,7 +120,11 @@ fn main() {
     };
 
     println!(
-        "Total time: {:?}, saved {:.2} {}B ({:.2}%)",
-        duration, formatted_size, size_prefix, saved_percent
+        "{}: {:?}, saved {:.2} {}B ({:.2}%)",
+        "Total time".green().bold(),
+        duration,
+        formatted_size,
+        size_prefix,
+        saved_percent
     );
 }
