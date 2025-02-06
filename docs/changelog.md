@@ -9,6 +9,7 @@ This document tracks the changes between cmprs versions. Dates are written in th
 - Added support for multiple input paths: `cmprs file1 file2 ...`.
   - This allows cmprs to work with glob expansion in shells like Bash and Zsh. `cmprs dir/*` can be used instead of `cmprs "dir/*"`.
 - Added support for custom formats of output files with the `-o`, `--output-format` option.
+- Added colored output text.
 
 ### Improvements
 
