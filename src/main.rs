@@ -14,6 +14,15 @@ use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::Instant;
 
+#[derive(Clone)]
+struct SharedData {
+    injector: Arc<Injector<String>>,
+    stealers: Arc<Vec<Stealer<String>>>,
+    orig_sizes: Arc<Mutex<Vec<usize>>>,
+    new_sizes: Arc<Mutex<Vec<usize>>>,
+    args: Arc<Args>,
+}
+
 fn scope_fn(
     injector: Arc<Injector<String>>,
     stealers: Arc<Vec<Stealer<String>>>,
@@ -63,9 +72,6 @@ fn main() {
     let num_workers = std::cmp::min(args.jobs.unwrap_or(num_threads), paths.len());
     println!("Compression with up to {} threads.", num_workers);
 
-    // Create a global injector
-    let injector = Arc::new(Injector::new());
-
     // Create local worker queues for each thread
     let mut workers = vec![];
     let mut stealers = vec![];
@@ -76,40 +82,40 @@ fn main() {
         workers.push(worker);
     }
 
-    let stealers = Arc::new(stealers);
-    let orig_sizes = Arc::new(Mutex::new(vec![0; num_workers]));
-    let new_sizes = Arc::new(Mutex::new(vec![0; num_workers]));
-    let args = Arc::new(args);
+    // Create a global injector
+    let shared = SharedData {
+        injector: Arc::new(Injector::new()),
+        stealers: Arc::new(stealers),
+        orig_sizes: Arc::new(Mutex::new(vec![0; num_workers])),
+        new_sizes: Arc::new(Mutex::new(vec![0; num_workers])),
+        args: Arc::new(args),
+    };
 
     // Populate the global injector with tasks
     for i in paths {
-        injector.push(i);
+        shared.injector.push(i);
     }
 
     let start = Instant::now();
 
     thread::scope(|scope| {
         for (i, worker) in workers.into_iter().enumerate() {
-            let injector = Arc::clone(&injector);
-            let stealers = Arc::clone(&stealers);
-
-            let orig_sizes = Arc::clone(&orig_sizes);
-            let new_sizes = Arc::clone(&new_sizes);
-            let args = Arc::clone(&args);
+            let shared = shared.clone();
 
             scope.spawn(move || {
-                let (local_orig, local_new) = scope_fn(injector, stealers, worker, args);
+                let (local_orig, local_new) =
+                    scope_fn(shared.injector, shared.stealers, worker, shared.args);
 
                 // Update size counts
-                orig_sizes.lock().unwrap()[i] = local_orig;
-                new_sizes.lock().unwrap()[i] = local_new;
+                shared.orig_sizes.lock().unwrap()[i] = local_orig;
+                shared.new_sizes.lock().unwrap()[i] = local_new;
             });
         }
     });
 
     let duration = start.elapsed();
-    let total_orig: usize = orig_sizes.lock().unwrap().iter().sum();
-    let total_new: usize = new_sizes.lock().unwrap().iter().sum();
+    let total_orig: usize = shared.orig_sizes.lock().unwrap().iter().sum();
+    let total_new: usize = shared.new_sizes.lock().unwrap().iter().sum();
     let diff = total_orig - total_new;
     let (formatted_size, size_prefix) = files::format_size(diff);
 
