@@ -126,9 +126,10 @@ fn main() {
     };
 
     println!(
-        "{}: {:?}, saved {:.2} {}B ({:.2}%)",
+        "{}: {:?}, {}: {:.2} {}B ({:.2}%)",
         "Total time".green().bold(),
         duration,
+        "saved".green().bold(),
         formatted_size,
         size_prefix,
         saved_percent
