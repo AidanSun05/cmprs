@@ -2,7 +2,7 @@
 
 This document tracks the changes between cmprs versions. Dates are written in the MM/DD/YYYY format.
 
-## 1.1.0 (Unreleased)
+## 1.1.0 (02/08/2025)
 
 ### Additions
 
