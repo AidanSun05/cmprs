@@ -60,14 +60,10 @@ jobs:
         zip cmprs-macos.zip cmprs-macos -r -qq
         zip cmprs-windows.zip cmprs-windows.exe -r -qq
 
-    - name: Get latest changes
-      run: echo "CHANGES=$(perl -0777 -ne 'print $1 if /\n## .*?\r?\n\r?\n(.*?)\r?\n\r?\n## /s' docs/changelog.md)" >> $GITHUB_OUTPUT
-      id: changes
-
     - name: Release
       uses: softprops/action-gh-release@v2
       with:
-        body: "${{ steps.changes.outputs.CHANGES }}"
+        body: "See the [changelog](https://github.com/AidanSun05/cmprs/blob/main/docs/changelog.md) for details on this release."
         files: |
           cmprs-linux.zip
           cmprs-macos.zip
